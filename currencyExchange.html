@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input id="amount" type="number" placeholder="Amount">
+    <select id="ConvertCurrency"></select>
+    <select id="ConvertToCurrency"></select>
+    <p id="result"></p>
+    <button>Convert</button>
+    <script>
+        const button = document.querySelector('button');
+        const ConvertCurrency = document.querySelector('#ConvertCurrency');
+        const ConvertToCurrency = document.querySelector('#ConvertToCurrency');
+        const result = document.querySelector('#result')
+
+        async function FetchCurrencies(){
+            const data = await fetch(`https://api.exchangerate-api.com/v4/latest/all`);
+            const response = await data.json();
+
+            const currencies = response;
+            const rates = currencies.rates;
+
+            Object.keys(rates).forEach(currency => {
+                console.log(currency);
+
+                const option1 = document.createElement('option');
+                option1.textContent = currency;
+
+                ConvertCurrency.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.textContent = currency;
+
+                ConvertToCurrency.appendChild(option2);
+            })
+        }
+
+        async function convertCurrency(){
+            const amount = document.querySelector('#amount').value;
+            const fromCurrency = ConvertCurrency.value;
+            const toCurrency = ConvertToCurrency.value;
+
+            const data = await fetch(`https://api.exchangerate-api.com/v4/latest/${fromCurrency}`);
+            const response = await data.json();
+
+            const convertRate = response.rates[toCurrency];
+            const convertedAmount = (amount * convertRate).toFixed(2);
+
+            result.innerHTML = `${amount} ${fromCurrency} = ${convertedAmount} ${toCurrency}`
+        }
+
+        FetchCurrencies();
+
+        button.addEventListener('click' , convertCurrency);
+    </script>
+</body>
+</html>
